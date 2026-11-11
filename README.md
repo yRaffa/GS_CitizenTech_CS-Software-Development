@@ -35,7 +35,7 @@ src/
  └─ CitizenTech.Desktop         Windows Forms (6 abas), usa os mesmos serviços e o mesmo banco
 tests/CitizenTech.Tests         testes unitários xUnit (57 casos)
 data/ml/                        CSV gerado pelo notebook de IA & ML
-evidencias/                     prints das evidências
+evidencias/                     prints e documentos das evidências
 ```
 Dependências: `Domain ← Application ← Infrastructure ← Api / Desktop`
 
