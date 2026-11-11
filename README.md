@@ -3,7 +3,7 @@
 ## 🌐 Global Solution 2026.2 · FIAP 🌐
 ## 💻 Engenharia de Software · C# Software Development 💻
 
-### 👥 Integrantes do Grupo
+### 👥 Integrantes
 | Nome | RM |
 |---|---|
 | André Luiz Fernandes de Queiroz | 554503 |
