@@ -19,7 +19,7 @@
 | Problema em uma frase | Estabelecimentos têm barreiras de acessibilidade e não sabem quais são nem a quem recorrer |
 | Como funciona | Questionário e medições guiadas → **triagem** de possíveis barreiras → indicação de parceiros especializados |
 | O que **não** fazemos | Obras, adaptações ou cursos; o diagnóstico é triagem e **não substitui** avaliação técnica presencial |
-| ODS | 4, 10 e 11 |
+| ODS | 4 (educação inclusiva), 10 (redução das desigualdades) e 11 (cidades acessíveis) |
 
 ## 	📦 O que esta entrega contém
 Backend em **C#/.NET 8** com **API REST**, **banco SQLite (EF Core)** e um **app Windows Forms** que usam as **mesmas regras e o mesmo banco**.
