@@ -54,13 +54,13 @@ Este documento reúne as evidências de funcionamento do projeto (testes, app Wi
 
 Execução dos testes unitários da solução no Visual Studio.
 
-### E01 — 57 testes unitários aprovados
+### E01 - 57 testes unitários aprovados
 
 **Onde:** Visual Studio – Gerenciador de Testes
 
 ![Gerenciador de Testes: 57 de 57 testes aprovados, 0 falhas.](01-testes-aprovados.png)
 
-*01 — Gerenciador de Testes: 57 de 57 testes aprovados, 0 falhas.*
+*01 - Gerenciador de Testes: 57 de 57 testes aprovados, 0 falhas.*
 
 **O que mostra:**
 
@@ -74,13 +74,13 @@ Execução dos testes unitários da solução no Visual Studio.
 
 O app importa o CSV de previsões gerado pelo notebook de ML (probabilidade de a escola não ter rampa) e agrega os resultados.
 
-### E02 — Importação das previsões do ML
+### E02 - Importação das previsões do ML
 
 **Onde:** App Windows Forms – aba Risco regional (ML)
 
 ![Mensagem de conclusão da importação do CSV do modelo de ML.](02-app-importacao-ml.png)
 
-*02 — Mensagem de conclusão da importação do CSV do modelo de ML.*
+*02 - Mensagem de conclusão da importação do CSV do modelo de ML.*
 
 **O que mostra:**
 
@@ -89,13 +89,13 @@ O app importa o CSV de previsões gerado pelo notebook de ML (probabilidade de a
 
 **O que comprova:** O app lê o arquivo gerado pela entrega de IA & ML e grava as 180.540 previsões no banco, sem nenhuma linha inválida.
 
-### E03 — Resumo do risco por região e por UF
+### E03 - Resumo do risco por região e por UF
 
 **Onde:** App Windows Forms – aba Risco regional (ML)
 
 ![Grades “Por região” e “Por UF” preenchidas após a importação.](03-app-risco-regional.png)
 
-*03 — Grades “Por região” e “Por UF” preenchidas após a importação.*
+*03 - Grades “Por região” e “Por UF” preenchidas após a importação.*
 
 **O que mostra:**
 
@@ -111,13 +111,13 @@ O app importa o CSV de previsões gerado pelo notebook de ML (probabilidade de a
 
 Telas do app, que usa os mesmos serviços, regras e banco da API.
 
-### E04 — Validação de formulário com mensagem amigável
+### E04 - Validação de formulário com mensagem amigável
 
 **Onde:** Aba Estabelecimentos
 
 ![Aviso exibido ao salvar com o formulário vazio.](04-app-validacao.png)
 
-*04 — Aviso exibido ao salvar com o formulário vazio.*
+*04 - Aviso exibido ao salvar com o formulário vazio.*
 
 **O que mostra:**
 
@@ -125,13 +125,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** As regras de domínio impedem dados inválidos e o app trata o erro sem travar, mostrando mensagem clara ao usuário.
 
-### E05 — Cadastro de uma escola (com código INEP)
+### E05 - Cadastro de uma escola (com código INEP)
 
 **Onde:** Aba Estabelecimentos
 
 ![Formulário preenchido e escola listada na grade.](05-app-estabelecimentos-escola.png)
 
-*05 — Formulário preenchido e escola listada na grade.*
+*05 - Formulário preenchido e escola listada na grade.*
 
 **O que mostra:**
 
@@ -140,13 +140,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** O cadastro persiste no banco e a região é derivada da UF. O código INEP é o elo com a previsão do modelo de ML.
 
-### E06 — Cadastro de um comércio (sem código INEP)
+### E06 - Cadastro de um comércio (sem código INEP)
 
 **Onde:** Aba Estabelecimentos
 
 ![Comércio cadastrado, com a coluna INEP vazia.](06-app-estabelecimentos-comercio.png)
 
-*06 — Comércio cadastrado, com a coluna INEP vazia.*
+*06 - Comércio cadastrado, com a coluna INEP vazia.*
 
 **O que mostra:**
 
@@ -154,13 +154,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** A plataforma atende estabelecimentos de vários tipos, não só escolas (o código INEP é opcional).
 
-### E07 — Diagnóstico de uma escola (com previsão do ML)
+### E07 - Diagnóstico de uma escola (com previsão do ML)
 
 **Onde:** Aba Avaliação e diagnóstico
 
 ![Triagem gerada para a Escola Teste.](07-app-diagnostico-escola.png)
 
-*07 — Triagem gerada para a Escola Teste.*
+*07 - Triagem gerada para a Escola Teste.*
 
 **O que mostra:**
 
@@ -173,13 +173,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** Fluxo central do produto: questionário e medições viram um diagnóstico por regras (polimorfismo), enriquecido com o modelo de ML, e a plataforma sugere parceiros da UF com a especialidade necessária, sem executar obras.
 
-### E08 — Diagnóstico de um comércio (sem previsão do ML)
+### E08 - Diagnóstico de um comércio (sem previsão do ML)
 
 **Onde:** Aba Avaliação e diagnóstico
 
 ![Triagem gerada para a Loja Teste.](08-app-diagnostico-comercio.png)
 
-*08 — Triagem gerada para a Loja Teste.*
+*08 - Triagem gerada para a Loja Teste.*
 
 **O que mostra:**
 
@@ -190,13 +190,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** O diagnóstico funciona também sem o código INEP (apenas por regras) e as barreiras mudam conforme as respostas e as medições informadas.
 
-### E09 — Encaminhamento criado
+### E09 - Encaminhamento criado
 
 **Onde:** Aba Avaliação e diagnóstico
 
 ![Mensagem de sucesso ao encaminhar o diagnóstico a um parceiro.](09-app-encaminhamento-criado.png)
 
-*09 — Mensagem de sucesso ao encaminhar o diagnóstico a um parceiro.*
+*09 - Mensagem de sucesso ao encaminhar o diagnóstico a um parceiro.*
 
 **O que mostra:**
 
@@ -204,13 +204,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** A plataforma conecta o diagnóstico a um parceiro; o encaminhamento nasce com status Pendente.
 
-### E10 — Lista e acompanhamento dos encaminhamentos
+### E10 - Lista e acompanhamento dos encaminhamentos
 
 **Onde:** Aba Encaminhamentos
 
 ![Lista de encaminhamentos com seus status.](10-app-encaminhamentos.png)
 
-*10 — Lista de encaminhamentos com seus status.*
+*10 - Lista de encaminhamentos com seus status.*
 
 **O que mostra:**
 
@@ -220,13 +220,13 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 **O que comprova:** Os encaminhamentos ficam registrados e o status evolui pelo fluxo permitido (o encaminhamento 1 já chegou a EmAnalise).
 
-### E11 — Regra de negócio: transição de status inválida
+### E11 - Regra de negócio: transição de status inválida
 
 **Onde:** Aba Encaminhamentos
 
 ![Tentativa de pular de Pendente para Concluido.](11-app-transicao-invalida.png)
 
-*11 — Tentativa de pular de Pendente para Concluido.*
+*11 - Tentativa de pular de Pendente para Concluido.*
 
 **O que mostra:**
 
@@ -238,21 +238,21 @@ Telas do app, que usa os mesmos serviços, regras e banco da API.
 
 Testes feitos pelo Swagger, com a API em execução em http://localhost:5000.
 
-### E12 — Consulta de uma avaliação
+### E12 - Consulta de uma avaliação
 
 **Onde:** Swagger – GET /api/avaliacoes/{id}
 
 ![Requisição com id = 1 (curl e URL gerados pelo Swagger).](12a-swagger-avaliacoes.png)
 
-*12A — Requisição com id = 1 (curl e URL gerados pelo Swagger).*
+*12A - Requisição com id = 1 (curl e URL gerados pelo Swagger).*
 
 ![Resposta HTTP 200 em JSON.](12b-swagger-avaliacoes.png)
 
-*12B — Resposta HTTP 200 em JSON.*
+*12B - Resposta HTTP 200 em JSON.*
 
 ![Modelo documentado da resposta 404 (ProblemDetails).](12c-swagger-avaliacoes.png)
 
-*12C — Modelo documentado da resposta 404 (ProblemDetails).*
+*12C - Modelo documentado da resposta 404 (ProblemDetails).*
 
 **O que mostra:**
 
@@ -262,21 +262,21 @@ Testes feitos pelo Swagger, com a API em execução em http://localhost:5000.
 
 **O que comprova:** O endpoint REST responde com dados persistidos, enums como texto legível e erro padronizado documentado (ProblemDetails).
 
-### E13 — Listagem de estabelecimentos com filtros e paginação
+### E13 - Listagem de estabelecimentos com filtros e paginação
 
 **Onde:** Swagger – GET /api/estabelecimentos
 
 ![Parâmetros: uf = SP, tipo = Escola, pagina = 1, tamanhoPagina = 20.](13a-swagger-estabelecimentos.png)
 
-*13A — Parâmetros: uf = SP, tipo = Escola, pagina = 1, tamanhoPagina = 20.*
+*13A - Parâmetros: uf = SP, tipo = Escola, pagina = 1, tamanhoPagina = 20.*
 
 ![Resposta HTTP 200 com a página de resultados.](13b-swagger-estabelecimentos.png)
 
-*13B — Resposta HTTP 200 com a página de resultados.*
+*13B - Resposta HTTP 200 com a página de resultados.*
 
 ![Modelo (Example Value) da resposta 200.](13c-swagger-estabelecimentos.png)
 
-*13C — Modelo (Example Value) da resposta 200.*
+*13C - Modelo (Example Value) da resposta 200.*
 
 **O que mostra:**
 
@@ -285,21 +285,21 @@ Testes feitos pelo Swagger, com a API em execução em http://localhost:5000.
 
 **O que comprova:** A API oferece filtros (UF e tipo) e paginação, calculando a região automaticamente.
 
-### E14 — Diagnóstico completo retornado pela API
+### E14 - Diagnóstico completo retornado pela API
 
 **Onde:** Swagger – GET /api/diagnosticos/{id}
 
 ![Requisição com id = 1.](14a-swagger-diagnostico.png)
 
-*14A — Requisição com id = 1.*
+*14A - Requisição com id = 1.*
 
 ![Resposta HTTP 200 com o diagnóstico.](14b-swagger-diagnostico.png)
 
-*14B — Resposta HTTP 200 com o diagnóstico.*
+*14B - Resposta HTTP 200 com o diagnóstico.*
 
 ![Modelo documentado da resposta 404.](14c-swagger-diagnostico.png)
 
-*14C — Modelo documentado da resposta 404.*
+*14C - Modelo documentado da resposta 404.*
 
 **O que mostra:**
 
@@ -310,17 +310,17 @@ Testes feitos pelo Swagger, com a API em execução em http://localhost:5000.
 
 **O que comprova:** A API entrega o diagnóstico completo e integrado ao modelo de ML (probabilidade 0,7104, a mesma mostrada no app em E07), com a ressalva de que é triagem.
 
-### E15 — Visão geral dos endpoints
+### E15 - Visão geral dos endpoints
 
 **Onde:** Swagger – página inicial
 
 ![Grupos Avaliacoes, Diagnosticos, Encaminhamentos e Estabelecimentos.](15a-swagger-visao-geral.png)
 
-*15A — Grupos Avaliacoes, Diagnosticos, Encaminhamentos e Estabelecimentos.*
+*15A - Grupos Avaliacoes, Diagnosticos, Encaminhamentos e Estabelecimentos.*
 
 ![Grupos Parceiros e Risco.](15b-swagger-visao-geral.png)
 
-*15B — Grupos Parceiros e Risco.*
+*15B - Grupos Parceiros e Risco.*
 
 **O que mostra:**
 
@@ -333,13 +333,13 @@ Testes feitos pelo Swagger, com a API em execução em http://localhost:5000.
 
 O mesmo arquivo citizentech.db usado pela API e pelo app, aberto no DBeaver.
 
-### E16 — Tabelas criadas pelo EF Core
+### E16 - Tabelas criadas pelo EF Core
 
 **Onde:** DBeaver – conexão citizentech.db
 
 ![Árvore do banco com as 9 tabelas.](16-banco-tabelas.png)
 
-*16 — Árvore do banco com as 9 tabelas.*
+*16 - Árvore do banco com as 9 tabelas.*
 
 **O que mostra:**
 
@@ -347,13 +347,13 @@ O mesmo arquivo citizentech.db usado pela API e pelo app, aberto no DBeaver.
 
 **O que comprova:** O banco foi criado automaticamente pelo EF Core, com o modelo relacional do projeto, e abre normalmente no DBeaver.
 
-### E17 — Parceiros de exemplo gravados no banco
+### E17 - Parceiros de exemplo gravados no banco
 
 **Onde:** DBeaver – SELECT * FROM Parceiros
 
 ![Resultado da consulta na tabela Parceiros.](17-banco-parceiros.png)
 
-*17 — Resultado da consulta na tabela Parceiros.*
+*17 - Resultado da consulta na tabela Parceiros.*
 
 **O que mostra:**
 
@@ -362,13 +362,13 @@ O mesmo arquivo citizentech.db usado pela API e pelo app, aberto no DBeaver.
 
 **O que comprova:** Os dados são persistidos e podem ser consultados por SQL. Os parceiros são fictícios, sem dados pessoais.
 
-### E18 — Previsões do ML gravadas no banco
+### E18 - Previsões do ML gravadas no banco
 
 **Onde:** DBeaver – SELECT COUNT(*) FROM PrevisoesRisco
 
 ![Script SQL e resultado da contagem de previsões.](18-banco-previsoes.png)
 
-*18 — Script SQL e resultado da contagem de previsões.*
+*18 - Script SQL e resultado da contagem de previsões.*
 
 **O que mostra:**
 
