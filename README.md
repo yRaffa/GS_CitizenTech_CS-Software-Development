@@ -1,6 +1,7 @@
 # ♿ CitizenTech · Acessibilidade Urbana ♿ 
 
-## 🌐 Global Solution 2026.2 · FIAP · Engenharia de Software · C# Software Development 🌐
+## 🌐 Global Solution 2026.2 · FIAP 🌐
+## 💻 Engenharia de Software · C# Software Development 💻
 
 ### 👥 Integrantes do Grupo
 | Nome | RM |
