@@ -15,90 +15,74 @@
 ## 📋 Ficha da CitizenTech
 | Campo | Conteúdo |
 |---|---|
+| Nome da CitizenTech | Acessibilidade Urbana |
 | Cidadão beneficiado | Pessoas com deficiência ou mobilidade reduzida |
-| Problema em uma frase | Estabelecimentos têm barreiras de acessibilidade e não sabem quais são nem a quem recorrer |
-| Como funciona | Questionário e medições guiadas → **triagem** de possíveis barreiras → indicação de parceiros especializados |
-| O que **não** fazemos | Obras, adaptações ou cursos; o diagnóstico é triagem e **não substitui** avaliação técnica presencial |
-| ODS | 4 (educação inclusiva), 10 (redução das desigualdades) e 11 (cidades acessíveis) |
+| Problema, em uma frase | Estabelecimentos têm barreiras de acessibilidade e não sabem quais são nem a quem recorrer |
+| Como funciona | A pessoa **observa** o local e registra a **foto** da barreira; responde o questionário e informa medições; a plataforma gera a **triagem** (regras + contexto do modelo de ML da disciplina de IA); **encaminha** o diagnóstico a um parceiro especializado, **reservando uma vaga de atendimento** na mesma transação |
+| Tecnologias | C# / .NET 8, ASP.NET Core Web API, EF Core 8 + **SQL Server**, Swagger, xUnit, app Windows Forms (HttpClient) |
+| Papel de cada parte | **C#:** API, banco SQL Server, imagens, transação e app Windows Forms. **IA & ML:** probabilidade de a escola não ter rampa (CSV importado pela API e usado no diagnóstico). **Demais disciplinas:** [PREENCHER conforme a equipe] |
+| Ecossistema / parceiros | Estabelecimentos (escolas, comércio, saúde), parceiros de obras, sinalização, Libras e consultoria técnica (**fictícios**) |
+| ODS | ODS 10, ODS 11 e ODS 4 |
 
-## 	📦 O que esta entrega contém
-Backend em **C#/.NET 8** com **API REST**, **banco SQLite (EF Core)** e um **app Windows Forms** que usam as **mesmas regras e o mesmo banco**.
-Ele se integra à entrega de **IA & ML**: a API importa o CSV de previsões do modelo (`data/ml/previsoes_escolas_oof.csv`) e o diagnóstico passa a informar a probabilidade de a escola não ter rampa e o contexto da UF.
+> 🚫 **O que não fazemos:** obras, adaptações ou cursos. O diagnóstico é uma **triagem** e **não substitui** a avaliação técnica presencial.
 
-## 🏗️ Arquitetura
+## 📦 Estrutura
 ```
-src/
- ├─ CitizenTech.Domain          entidades (POO/encapsulamento), enums, exceções e interfaces dos repositórios
- ├─ CitizenTech.Application     serviços, DTOs, regras de diagnóstico (herança + polimorfismo), leitor do CSV de ML
- ├─ CitizenTech.Infrastructure  EF Core + SQLite, configurações das tabelas, repositórios (LINQ), injeção de dependência
- ├─ CitizenTech.Api             Web API (controllers, Swagger, tratamento de erros)
- └─ CitizenTech.Desktop         Windows Forms (6 abas), usa os mesmos serviços e o mesmo banco
-tests/CitizenTech.Tests         testes unitários xUnit (57 casos)
-data/ml/                        CSV gerado pelo notebook de IA & ML
-evidencias/                     prints e documentos das evidências
+GS_CitizenTech_CS-Software-Development/
+├─ README.md                    este arquivo
+├─ CitizenTech.Acessibilidade.sln
+├─ src/
+│  ├─ CitizenTech.Api/          API (controllers, Swagger, middleware) + equipe.json
+│  ├─ CitizenTech.Application/  serviços, DTOs, regras de diagnóstico, validação de imagem, transação de encaminhamento com reserva
+│  ├─ CitizenTech.Domain/       entidades, exceções, interfaces
+│  ├─ CitizenTech.Infrastructure/ EF Core + SQL Server, configurações, repositórios (LINQ)
+│  └─ CitizenTech.Desktop/      app Windows Forms de 6 abas (cliente HttpClient; NÃO acessa o banco)
+├─ tests/CitizenTech.Tests/     testes automatizados xUnit (opcional, complementa T01–T10)
+├─ data/ml/                     previsoes_escolas_oof.csv (saída da disciplina de IA & ML)
+├─ modelo/                      modelo.png · DICIONARIO_DADOS.md
+├─ sql/                         aruivos sql de criação do banco
+├─ testes/                      api.http
+├─ docs/                        relatorio.docx
+├─ evidencias/                  indice.md + capturas
+└─ amostras/                    imagem_de_teste.jpg · testes_invalidos/
 ```
-Dependências: `Domain ← Application ← Infrastructure ← Api / Desktop`
+
+## 🚀 Como executar
+1. **Banco:** no SSMS, Azure Data Studio ou DBeaver conectado ao SQL Server, execute **na ordem**: `sql/01_Criar_Estrutura.sql` (cria o banco `CitizenTechDb` e as 11 tabelas) → `sql/02_Carga_Ficticia.sql` (3 estabelecimentos e 7 parceiros fictícios; o parceiro 1 começa com **20 vagas**). A API **não** cria tabelas.
+   - **No DBeaver** use as versões sem `GO` em `sql/dbeaver/` (`*_DBeaver.sql`) e execute com **Alt+X**; no SSMS/sqlcmd use os originais.
+   - LocalDB, se ainda não existir: `sqllocaldb create MSSQLLocalDB` e `sqllocaldb start MSSQLLocalDB`.
+2. **Conexão:** o padrão em `src/CitizenTech.Api/appsettings.json` usa **autenticação do Windows** no LocalDB. Para outra instância/credencial, **não grave senha no arquivo**: use `dotnet user-secrets set "ConnectionStrings:CitizenTech" "<string>"` na pasta da API ou a variável de ambiente `ConnectionStrings__CitizenTech`.
+3. **Build e testes automatizados**
+   ```bash
+   dotnet restore
+   dotnet build
+   dotnet test            # testes xUnit (opcional)
+   ```
+4. **API:** `dotnet run --project src/CitizenTech.Api` (Swagger em `http://localhost:5080/swagger`). Na inicialização o log informa se a conexão com o SQL Server foi verificada.
+5. **App Windows Forms:** com a API ligada: `dotnet run --project src/CitizenTech.Desktop`. As abas seguem o fluxo: 1 API e equipe · 2 Estabelecimentos · 3 Avaliar e diagnosticar · 4 Foto da barreira · 5 Encaminhar com reserva · 6 Risco regional (ML). A URL da API fica em `src/CitizenTech.Desktop/appsettings.json`.
+6. **Importar o modelo de ML:** Swagger → `POST /api/risco/importar` (≈1 min para o Brasil; `?uf=SP` é mais rápido).
+
+## 🔌 Endpoints
+| Método e rota | Função |
+|---|---|
+| `GET /api/equipe` | Identificação da equipe (lida de `equipe.json`) |
+| `GET /api/estabelecimentos` · `GET /api/parceiros` | Consultas do domínio (filtros e paginação) |
+| `POST /api/imagens` (multipart) | Envia imagem PNG/JPEG ≤ 2 MiB → **201** com ID |
+| `GET /api/imagens/{id}` · `GET /api/imagens?estabelecimentoId=` | Metadados em JSON |
+| `GET /api/imagens/{id}/conteudo` | Bytes com `Content-Type` `image/png` ou `image/jpeg` |
+| `POST /api/reservas` · `GET /api/reservas` | **Encaminhar diagnóstico a parceiro com reserva de vaga** (UPDATE saldo + INSERT encaminhamento + INSERT reserva na mesma transação) e consulta das reservas |
+| `POST /api/estabelecimentos/{id}/avaliacoes` · `POST /api/avaliacoes/{id}/diagnosticos` · `GET /api/diagnosticos/{id}/parceiros-sugeridos` | Fluxo de avaliação e triagem |
+| `GET/POST /api/encaminhamentos` · `PATCH /api/encaminhamentos/{id}/status` | Encaminhamentos e ciclo de vida |
+| `GET /api/risco/regioes` · `/ufs` · `/escolas/{inep}` · `POST /api/risco/importar` | Risco regional do modelo de ML |
+
+Códigos: 200/201 sucesso · 400 entrada inválida · 404 inexistente · 409 saldo insuficiente ou encaminhamento repetido · 413 acima de 2 MiB · 500 `Transação revertida (ROLLBACK)` · 503 banco indisponível.
 
 ## 🎯 Como atende cada critério
 | Critério | Onde ver |
 |---|---|
-| **POO** | `Domain/Entities` (construtores validando regras, `private set`, coleções somente leitura, objeto de valor `Endereco`, máquina de estados em `Encaminhamento`); `Application/Regras` (interface `IRegraDiagnostico`, classe base abstrata `RegraDiagnosticoBase`, 3 regras concretas, polimorfismo); interfaces de repositório |
-| **Web API** | `Api/Controllers` (REST, verbos e códigos HTTP corretos, `[ApiController]`, DTOs, validação, `ProblemDetails`) + `docs/ENDPOINTS.md` |
-| **EF Core + LINQ** | `Infrastructure/Persistencia` (DbContext, `IEntityTypeConfiguration`, owned type, índices, cascata) e `Repositorios` (filtros, paginação, `Include`, `GROUP BY` com `Count/Average`); LINQ também nos serviços (ranking de parceiros) |
-| **Async/Await** | Todos os repositórios, serviços e endpoints são assíncronos com `CancellationToken`; importação do CSV com `ReadLineAsync`; app Windows Forms não trava a tela |
-| **Qualidade** | Camadas, injeção de dependência, middleware de erros, Swagger, 57 casos de teste |
-
-## 🚀 Como rodar
-Pré-requisito: **.NET 8 SDK** (`dotnet --version`). O app Windows Forms só roda no **Windows**. (Com apenas .NET 9/10 instalado, o projeto roda graças ao `RollForward`, mas o ideal é o SDK 8.)
-```bash
-dotnet restore
-dotnet test                                  # Testes Unitários
-dotnet run --project src/CitizenTech.Api     # http://localhost:5080/swagger
-dotnet run --project src/CitizenTech.Desktop # Aplicação Windows Forms
-```
-O banco é criado sozinho na primeira execução, com **7 parceiros fictícios** de exemplo (marcados "(exemplo)").
-Para carregar o modelo de ML: Swagger → `POST /api/risco/importar` (ou aba **Risco regional (ML)** no app). Leva cerca de 1 minuto para o Brasil inteiro (use `?uf=SP` importar UFs separadamente).
-
-## 🗄️ Onde fica o banco
-Por padrão: `%LOCALAPPDATA%\CitizenTech\citizentech.db` (API e app usam **o mesmo arquivo**; a aba **Banco de dados** do app mostra o caminho e tem o botão "Copiar caminho"). Para mudar, edite `Banco:CaminhoSqlite` no `appsettings.json`.
-1. DBeaver → **Novo banco de dados** (Ctrl+Shift+N) → **SQLite** → Avançar.
-2. Em **Path**, cole o caminho do arquivo → Finalizar.
-3. Abra `Tables`: `Estabelecimentos`, `Avaliacoes`, `RespostasItens`, `Medicoes`, `Diagnosticos`, `Barreiras`, `Parceiros`, `Encaminhamentos`, `PrevisoesRisco`.
-
-## 📏 Regras do diagnóstico
-Aplicadas por `DiagnosticoService` (cada regra implementa `IRegraDiagnostico`). Os limites são **valores de referência inspirados na NBR 9050**.
-- **Itens do questionário** respondidos "Não" geram barreira (rampa, banheiro adaptado, corrimão, piso tátil, sinalização, elevador, vaga, Libras), cada uma com gravidade e especialidade sugerida.
-- **Medições fora do limite** (inclinação, porta, corredor) geram barreira.
-- **Informação pendente**: itens sem resposta ou "Não sei" geram um alerta de baixa gravidade.
-- **Nível de risco**: Alto (2+ barreiras altas ou pontuação ≥ 7), Médio (1 alta ou pontuação ≥ 3), Baixo (demais). Se o modelo de ML indicar faixa **Alta**, o nível sobe um grau.
-- **Parceiros sugeridos**: mesma UF + especialidade necessária, ordenados por aderência.
-
-## 🔌 Endpoints
-
-Swagger interativo: `http://localhost:5080/swagger`
-
-Erros seguem o padrão `ProblemDetails`: **400** (validação ou regra de negócio), **404** (não encontrado), **500** (erro inesperado).
-
-| Método | Rota | Descrição |
-|---|---|---|
-| GET | `/api/estabelecimentos?uf=&tipo=&pagina=&tamanhoPagina=` | Lista paginada com filtros |
-| GET | `/api/estabelecimentos/{id}` | Detalhe |
-| POST | `/api/estabelecimentos` | Cadastra (201) |
-| PUT | `/api/estabelecimentos/{id}` | Atualiza |
-| DELETE | `/api/estabelecimentos/{id}` | Remove (204) e, em cascata, avaliações e diagnósticos |
-| POST | `/api/estabelecimentos/{id}/avaliacoes` | Registra questionário + medições (201) |
-| GET | `/api/estabelecimentos/{id}/avaliacoes` | Lista avaliações do estabelecimento |
-| GET | `/api/estabelecimentos/{id}/diagnosticos` | Lista diagnósticos do estabelecimento |
-| GET | `/api/avaliacoes/{id}` | Detalhe da avaliação |
-| POST | `/api/avaliacoes/{id}/diagnosticos` | **Gera a triagem** (201) |
-| GET | `/api/diagnosticos/{id}` | Detalhe do diagnóstico |
-| GET | `/api/diagnosticos/{id}/parceiros-sugeridos` | Parceiros por UF e especialidade, ordenados por aderência |
-| GET | `/api/parceiros?especialidade=&uf=` | Lista parceiros ativos |
-| POST | `/api/parceiros` | Cadastra parceiro (201) |
-| POST | `/api/encaminhamentos` | Conecta diagnóstico a parceiro (201). Bloqueia duplicidade |
-| GET | `/api/encaminhamentos?status=` | Lista (filtro por status) |
-| PATCH | `/api/encaminhamentos/{id}/status` | Pendente → Enviado → EmAnalise → Concluido (Cancelado antes do fim) |
-| POST | `/api/risco/importar?uf=` | Importa o CSV do modelo de ML (**apaga e recarrega** a tabela) |
-| GET | `/api/risco/regioes` | % sem rampa e risco médio por região |
-| GET | `/api/risco/ufs?regiao=` | Idem por UF |
-| GET | `/api/risco/escolas/{codigoInep}` | Previsão do modelo para uma escola |
+| GS · POO, interfaces, DI | entidades com regras (`Domain/Entities`), interfaces de repositório e serviço, injeção em `Infrastructure/DependencyInjection.cs` |
+| GS · Web API e Swagger | `src/CitizenTech.Api/Controllers` + Swagger em `/swagger` |
+| GS · EF Core + LINQ | `Infrastructure/Persistencia` (mapeamentos) e `Repositorios` (projeções, `Include`, agrupamentos) |
+| GS · async/await | todos os serviços e repositórios usam `async` com `CancellationToken` |
+| GS · testes unitários / qualidade | `tests/CitizenTech.Tests` (xUnit, repositórios em memória); camadas `Domain ← Application ← Infrastructure ← Api` |
+| D01 · modelo, SQL, imagem, transação, validações, T01–T10, evidências | `modelo/`, `sql/`, `ImagemService`, `ReservaService`, `testes/api.http`, `evidencias/`, `docs/relatorio.docx` |

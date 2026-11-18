@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- App Windows Forms: cliente da API (HttpClient). Não acessa o banco. -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -8,12 +9,6 @@
     <RootNamespace>CitizenTech.Desktop</RootNamespace>
     <RollForward>LatestMajor</RollForward>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.*" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CitizenTech.Infrastructure\CitizenTech.Infrastructure.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>
   </ItemGroup>

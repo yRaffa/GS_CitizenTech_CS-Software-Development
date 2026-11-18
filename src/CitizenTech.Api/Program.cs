@@ -10,12 +10,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-// Banco (EF Core + SQLite), repositórios, regras de diagnóstico e serviços
+// Banco (EF Core + SQL Server), repositórios, regras de diagnóstico e serviços
 builder.Services.AddCitizenTech(builder.Configuration);
 
 var app = builder.Build();
 
-await app.Services.InicializarBancoAsync();
+await app.Services.VerificarBancoAsync();
 
 app.UseMiddleware<TratamentoDeErrosMiddleware>();
 app.UseSwagger();

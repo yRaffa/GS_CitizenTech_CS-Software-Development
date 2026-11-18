@@ -1,0 +1,12 @@
+{
+  "citizenTech": "Acessibilidade Urbana",
+  "turma": "3ESPH",
+  "rmLider": "RM554736",
+  "integrantes": [
+    { "nomeCompleto": "Rafael Federici de Oliveira", "rm": "RM554736", "turma": "3ESPH", "nomeAlunoRm": "RafaelOliveira_RM554736", "lider": true },
+    { "nomeCompleto": "Andre Luiz Fernandes de Queiroz", "rm": "RM554503", "turma": "3ESPH", "nomeAlunoRm": "AndreQueiroz_RM554503", "lider": false },
+    { "nomeCompleto": "Marcos Vinicius da Silva Costa", "rm": "RM555490", "turma": "3ESPH", "nomeAlunoRm": "MarcosCosta_RM555490", "lider": false },
+    { "nomeCompleto": "Paulo Pocas", "rm": "RM556080", "turma": "3ESPH", "nomeAlunoRm": "PauloPocas_RM556080", "lider": false },
+    { "nomeCompleto": "Rafael Bocchi", "rm": "RM557603", "turma": "3ESPH", "nomeAlunoRm": "RafaelBocchi_RM557603", "lider": false }
+  ]
+}

@@ -1,0 +1,278 @@
+### =====================================================================
+### CitizenTech - roteiro HTTP T01-T10 (VS Code REST Client ou Visual Studio .http)
+### Antes: executar sql/01 e sql/02, ajustar src/CitizenTech.Api/equipe.json e iniciar a API.
+### Troque @executor por um NomeAluno_RM REAL (o mesmo do equipe.json) e @idImagem pelo ID devolvido no T01.
+### Imagens de teste: amostras/imagem_de_teste.jpg e amostras/testes_invalidos/
+### =====================================================================
+@base = http://localhost:5080
+@executor = NomeLider_RM000000
+@idImagem = 1
+@diagnosticoId = 1
+
+### T01 - consultas (HTTP 200)
+GET {{base}}/api/equipe
+
+###
+GET {{base}}/api/estabelecimentos
+
+###
+GET {{base}}/api/parceiros
+
+### T01 - envio de imagem válida (espera 201 com ID). O caminho do arquivo é relativo a esta pasta.
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Rampa de entrada sem corrimão
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="imagem_de_teste.jpg"
+Content-Type: image/jpeg
+
+< ../amostras/imagem_de_teste.jpg
+--FRONTEIRA--
+
+### T02 - após PARAR e REINICIAR a API: metadados e conteúdo pelo ID (sem reenviar o arquivo)
+GET {{base}}/api/imagens/{{idImagem}}
+
+###
+GET {{base}}/api/imagens/{{idImagem}}/conteudo
+
+### T03 - arquivo vazio (espera 400, nenhum registro novo)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Teste arquivo vazio
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="vazio.png"
+Content-Type: image/png
+
+< ../amostras/testes_invalidos/vazio.png
+--FRONTEIRA--
+
+### T03 - título vazio (espera 400)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+ 
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="imagem_de_teste.jpg"
+Content-Type: image/jpeg
+
+< ../amostras/imagem_de_teste.jpg
+--FRONTEIRA--
+
+### T04 - .png disfarçado (bytes de texto) (espera 400)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Png falso
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="falso.png"
+Content-Type: image/png
+
+< ../amostras/testes_invalidos/falso.png
+--FRONTEIRA--
+
+### T04 - formato não aceito, GIF (espera 400)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Formato gif
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="animacao.gif"
+Content-Type: image/gif
+
+< ../amostras/testes_invalidos/formato_gif.gif
+--FRONTEIRA--
+
+### T04 - arquivo com mais de 2 MiB e menos de 3 MiB (espera 413)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Arquivo grande
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+1
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="grande_2_5MiB.jpg"
+Content-Type: image/jpeg
+
+< ../amostras/testes_invalidos/grande_2_5MiB.jpg
+--FRONTEIRA--
+
+### T05 - imagem inexistente (espera 404)
+GET {{base}}/api/imagens/999999
+
+###
+GET {{base}}/api/imagens/999999/conteudo
+
+### T05 - vínculo inexistente: estabelecimentoId 999999 (espera 404, sem gravação)
+POST {{base}}/api/imagens
+Content-Type: multipart/form-data; boundary=FRONTEIRA
+
+--FRONTEIRA
+Content-Disposition: form-data; name="titulo"
+
+Vinculo inexistente
+--FRONTEIRA
+Content-Disposition: form-data; name="estabelecimentoId"
+
+999999
+--FRONTEIRA
+Content-Disposition: form-data; name="executor"
+
+{{executor}}
+--FRONTEIRA
+Content-Disposition: form-data; name="arquivo"; filename="imagem_de_teste.jpg"
+Content-Type: image/jpeg
+
+< ../amostras/imagem_de_teste.jpg
+--FRONTEIRA--
+
+### PREPARO (fluxo da CitizenTech, antes do T06): P1 avaliação do estabelecimento 1 (rampa inexistente, inclinação 12% acima do limite de 8,33%)
+POST {{base}}/api/estabelecimentos/1/avaliacoes
+Content-Type: application/json
+
+{
+  "respostas": [
+    { "item": "Rampa", "valor": "Nao" }, { "item": "Corrimao", "valor": "Sim" }, { "item": "BanheiroAdaptado", "valor": "Nao" },
+    { "item": "PisoTatil", "valor": "Nao" }, { "item": "SinalizacaoVisual", "valor": "Sim" }, { "item": "Elevador", "valor": "NaoSei" },
+    { "item": "VagaPreferencial", "valor": "Sim" }, { "item": "AtendimentoLibras", "valor": "Nao" }
+  ],
+  "medicoes": [
+    { "tipo": "InclinacaoRampaPercentual", "valor": 12 }, { "tipo": "LarguraPortaCm", "valor": 70 }, { "tipo": "LarguraCorredorCm", "valor": 120 }
+  ],
+  "observacoes": "Observação no local (dados fictícios de exemplo)."
+}
+
+### PREPARO P2: gera o diagnóstico da avaliação 1 (triagem preliminar com barreiras, nível de risco e contexto do ML). Anote o ID e ajuste @diagnosticoId
+POST {{base}}/api/avaliacoes/1/diagnosticos
+
+### PREPARO P3: parceiros sugeridos para o diagnóstico (UF + especialidades das barreiras)
+GET {{base}}/api/diagnosticos/{{diagnosticoId}}/parceiros-sugeridos
+
+### T06 - quantidade zero (espera 400)
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "parceiroId": 1, "diagnosticoId": {{diagnosticoId}}, "quantidade": 0, "executor": "{{executor}}" }
+
+### T06 - quantidade negativa (espera 400)
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "parceiroId": 1, "diagnosticoId": {{diagnosticoId}}, "quantidade": -2, "executor": "{{executor}}" }
+
+### T06 - saldo insuficiente: 1000 vagas (espera 409)
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "parceiroId": 1, "diagnosticoId": {{diagnosticoId}}, "quantidade": 1000, "executor": "{{executor}}" }
+
+### T06 - executor não cadastrado (espera 400)
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "parceiroId": 1, "diagnosticoId": {{diagnosticoId}}, "quantidade": 1, "executor": "Estranho_RM999999" }
+
+### T07 - ANTES: rode a consulta C de sql/03 (saldo do parceiro 1 = 20, 0 reservas). COMMIT: reserva 3 vagas (espera 201)
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "parceiroId": 1, "diagnosticoId": {{diagnosticoId}}, "quantidade": 3, "executor": "{{executor}}" }
+
+### T07 - DEPOIS: lista de reservas, encaminhamentos e parceiros (saldo 17, 1 reserva, 1 encaminhamento)
+GET {{base}}/api/reservas?parceiroId=1
+
+###
+GET {{base}}/api/encaminhamentos
+
+###
+GET {{base}}/api/parceiros
+
+### T06b - o MESMO diagnóstico ao MESMO parceiro de novo (espera 409: encaminhamento já existe, nada é gravado). Rode depois do T07.
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "diagnosticoId": {{diagnosticoId}}, "parceiroId": 1, "quantidade": 1, "executor": "{{executor}}" }
+
+### T08 - ANTES: saldo do parceiro 5 = 15 e nenhuma reserva dele (consulta C do sql/03 com @ParceiroId = 5).
+### Falha controlada DEPOIS do UPDATE e dos INSERTs e ANTES do COMMIT (espera 500 "Transação revertida (ROLLBACK)")
+POST {{base}}/api/reservas
+Content-Type: application/json
+
+{ "diagnosticoId": {{diagnosticoId}}, "parceiroId": 5, "quantidade": 2, "executor": "{{executor}}", "simularFalhaAposEscritas": true }
+
+### T08 - DEPOIS: parceiro 5 continua com 15 vagas, sem reserva dele; encaminhamentos continua com 1 linha (a do T07)
+GET {{base}}/api/reservas?parceiroId=5
+
+###
+GET {{base}}/api/encaminhamentos
+
+###
+GET {{base}}/api/parceiros
+
+### T10 - PARE somente a API e repita qualquer chamada acima: o cliente deve mostrar erro de comunicação. Reinicie a API e repita: deve funcionar.
+GET {{base}}/api/equipe

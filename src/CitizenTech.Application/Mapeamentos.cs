@@ -1,4 +1,5 @@
 using CitizenTech.Application.Dtos;
+using CitizenTech.Application.Equipe;
 using CitizenTech.Domain.Entities;
 using CitizenTech.Domain.Models;
 
@@ -25,7 +26,7 @@ public static class Mapeamentos
         d.Barreiras.OrderByDescending(b => b.Gravidade).Select(b => b.ToDto()).ToList());
 
     public static ParceiroResponse ToResponse(this Parceiro p) =>
-        new(p.Id, p.Nome, p.Descricao, p.Especialidades, p.UfsAtendidas, p.Email, p.Telefone, p.Ativo);
+        new(p.Id, p.Nome, p.Descricao, p.Especialidades, p.UfsAtendidas, p.Email, p.Telefone, p.Ativo, p.VagasAtendimento);
 
     public static EncaminhamentoResponse ToResponse(this Encaminhamento e, string parceiroNome) =>
         new(e.Id, e.DiagnosticoId, e.ParceiroId, parceiroNome, e.Status, e.Observacao, e.DataCriacao, e.DataAtualizacao);
@@ -35,4 +36,14 @@ public static class Mapeamentos
 
     public static PrevisaoEscolaResponse ToResponse(this PrevisaoRisco p) =>
         new(p.CodigoInep, p.Regiao, p.Uf, p.CodigoMunicipio, p.ProbSemRampa, p.SemRampaDeclarado, p.Faixa);
+
+    public static EquipeResponse ToResponse(this EquipeInfo e) => new(e.CitizenTech, e.Turma, e.RmLider,
+        e.Integrantes.Select(i => new IntegranteResponse(i.NomeCompleto, i.Rm, i.Turma, i.NomeAlunoRm, i.Lider)).ToList());
+
+    public static ImagemResponse ToResponse(this ImagemMetadados m) => new(
+        m.Id, m.EstabelecimentoId, m.Titulo, m.NomeArquivo, m.TipoMime, m.TamanhoBytes, m.DataUtc,
+        m.EquipeRmLider, m.Executor, $"/api/imagens/{m.Id}/conteudo");
+
+    public static ReservaResponse ToResponse(this ReservaAtendimento r, string parceiroNome, int vagasRestantes) => new(
+        r.Id, r.Encaminhamento?.Id ?? r.EncaminhamentoId, r.DiagnosticoId, r.ParceiroId, parceiroNome, r.EstabelecimentoId, r.Quantidade, vagasRestantes, r.DataUtc, r.EquipeRmLider, r.Executor);
 }

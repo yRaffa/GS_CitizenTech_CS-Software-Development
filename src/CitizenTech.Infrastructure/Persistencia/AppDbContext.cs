@@ -18,6 +18,8 @@ public class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Parceiro> Parceiros => Set<Parceiro>();
     public DbSet<Encaminhamento> Encaminhamentos => Set<Encaminhamento>();
     public DbSet<PrevisaoRisco> Previsoes => Set<PrevisaoRisco>();
+    public DbSet<ImagemEstabelecimento> Imagens => Set<ImagemEstabelecimento>();
+    public DbSet<ReservaAtendimento> Reservas => Set<ReservaAtendimento>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,4 +28,8 @@ public class AppDbContext : DbContext, IUnitOfWork
     }
 
     public Task<int> SalvarAsync(CancellationToken ct = default) => SaveChangesAsync(ct);
+
+    /// <summary>BEGIN TRANSACTION local no SQL Server (sem transação distribuída).</summary>
+    public async Task<ITransacaoBanco> IniciarTransacaoAsync(CancellationToken ct = default) =>
+        new TransacaoEf(await Database.BeginTransactionAsync(ct));
 }

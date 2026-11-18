@@ -188,3 +188,47 @@ public class PrevisaoRiscoRepositorio : IPrevisaoRiscoRepository
             .ToList();
     }
 }
+
+public class ImagemRepositorio : IImagemRepository
+{
+    private readonly AppDbContext _db;
+    public ImagemRepositorio(AppDbContext db) => _db = db;
+
+    public async Task AdicionarAsync(ImagemEstabelecimento imagem, CancellationToken ct = default) =>
+        await _db.Imagens.AddAsync(imagem, ct);
+
+    // Projeção LINQ: o SELECT não inclui a coluna Dados (varbinary), então listar/consultar metadados é leve.
+    public Task<ImagemMetadados?> ObterMetadadosAsync(int id, CancellationToken ct = default) =>
+        _db.Imagens.AsNoTracking()
+            .Where(i => i.Id == id)
+            .Select(i => new ImagemMetadados(i.Id, i.EstabelecimentoId, i.Titulo, i.NomeArquivo, i.TipoMime,
+                                             i.TamanhoBytes, i.DataUtc, i.EquipeRmLider, i.Executor))
+            .FirstOrDefaultAsync(ct);
+
+    public async Task<IReadOnlyList<ImagemMetadados>> ListarPorEstabelecimentoAsync(int estabelecimentoId, CancellationToken ct = default) =>
+        await _db.Imagens.AsNoTracking()
+            .Where(i => i.EstabelecimentoId == estabelecimentoId)
+            .OrderByDescending(i => i.DataUtc)
+            .Select(i => new ImagemMetadados(i.Id, i.EstabelecimentoId, i.Titulo, i.NomeArquivo, i.TipoMime,
+                                             i.TamanhoBytes, i.DataUtc, i.EquipeRmLider, i.Executor))
+            .ToListAsync(ct);
+
+    public Task<ImagemEstabelecimento?> ObterComConteudoAsync(int id, CancellationToken ct = default) =>
+        _db.Imagens.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id, ct);
+}
+
+public class ReservaRepositorio : IReservaRepository
+{
+    private readonly AppDbContext _db;
+    public ReservaRepositorio(AppDbContext db) => _db = db;
+
+    public async Task AdicionarAsync(ReservaAtendimento reserva, CancellationToken ct = default) =>
+        await _db.Reservas.AddAsync(reserva, ct);
+
+    public async Task<IReadOnlyList<ReservaAtendimento>> ListarAsync(int? parceiroId, CancellationToken ct = default)
+    {
+        IQueryable<ReservaAtendimento> consulta = _db.Reservas.AsNoTracking().Include(r => r.Parceiro);
+        if (parceiroId is not null) { var id = parceiroId.Value; consulta = consulta.Where(r => r.ParceiroId == id); }
+        return await consulta.OrderBy(r => r.Id).ToListAsync(ct);
+    }
+}

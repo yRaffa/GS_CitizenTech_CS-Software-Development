@@ -96,13 +96,14 @@ public class ParceiroConfig : IEntityTypeConfiguration<Parceiro>
 {
     public void Configure(EntityTypeBuilder<Parceiro> b)
     {
-        b.ToTable("Parceiros");
+        b.ToTable("Parceiros", t => t.HasCheckConstraint("CK_Parceiros_Vagas", "[VagasAtendimento] >= 0"));
         b.HasKey(x => x.Id);
         b.Property(x => x.Nome).IsRequired().HasMaxLength(150);
         b.Property(x => x.Descricao).HasMaxLength(500);
         b.Property(x => x.UfsAtendidas).IsRequired().HasMaxLength(200);
         b.Property(x => x.Email).IsRequired().HasMaxLength(150);
         b.Property(x => x.Telefone).HasMaxLength(30);
+        b.Property(x => x.VagasAtendimento).IsRequired();
     }
 }
 
@@ -130,5 +131,39 @@ public class PrevisaoRiscoConfig : IEntityTypeConfiguration<PrevisaoRisco>
         b.Property(x => x.Uf).IsRequired().HasMaxLength(2);
         b.HasIndex(x => x.CodigoInep).IsUnique();
         b.HasIndex(x => x.Uf);
+    }
+}
+
+public class ImagemEstabelecimentoConfig : IEntityTypeConfiguration<ImagemEstabelecimento>
+{
+    public void Configure(EntityTypeBuilder<ImagemEstabelecimento> b)
+    {
+        b.ToTable("ImagensEstabelecimento");
+        b.HasKey(x => x.Id);
+        b.Property(x => x.Titulo).IsRequired().HasMaxLength(100);
+        b.Property(x => x.NomeArquivo).IsRequired().HasMaxLength(255);
+        b.Property(x => x.TipoMime).IsRequired().HasMaxLength(50);
+        b.Property(x => x.Dados).IsRequired().HasColumnType("varbinary(max)"); // bytes da imagem
+        b.Property(x => x.EquipeRmLider).IsRequired().HasMaxLength(30);
+        b.Property(x => x.Executor).IsRequired().HasMaxLength(100);
+        b.HasIndex(x => x.EstabelecimentoId);
+
+        b.HasOne(x => x.Estabelecimento).WithMany().HasForeignKey(x => x.EstabelecimentoId).OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class ReservaAtendimentoConfig : IEntityTypeConfiguration<ReservaAtendimento>
+{
+    public void Configure(EntityTypeBuilder<ReservaAtendimento> b)
+    {
+        b.ToTable("ReservasAtendimento", t => t.HasCheckConstraint("CK_Reservas_Quantidade", "[Quantidade] > 0"));
+        b.HasKey(x => x.Id);
+        b.Property(x => x.EquipeRmLider).IsRequired().HasMaxLength(30);
+        b.Property(x => x.Executor).IsRequired().HasMaxLength(100);
+
+        b.HasOne(x => x.Encaminhamento).WithMany().HasForeignKey(x => x.EncaminhamentoId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne(x => x.Diagnostico).WithMany().HasForeignKey(x => x.DiagnosticoId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne(x => x.Parceiro).WithMany().HasForeignKey(x => x.ParceiroId).OnDelete(DeleteBehavior.Restrict);
+        b.HasOne(x => x.Estabelecimento).WithMany().HasForeignKey(x => x.EstabelecimentoId).OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -11,8 +11,9 @@ public class Parceiro
 
     private Parceiro() { Nome = Descricao = Email = UfsAtendidas = string.Empty; } // EF Core
 
-    public Parceiro(string nome, string descricao, Especialidade especialidades, IEnumerable<string> ufsAtendidas, string email, string? telefone = null)
+    public Parceiro(string nome, string descricao, Especialidade especialidades, IEnumerable<string> ufsAtendidas, string email, string? telefone = null, int vagasAtendimento = 0)
     {
+        if (vagasAtendimento < 0) throw new DomainException("Vagas de atendimento não pode ser negativo.");
         if (string.IsNullOrWhiteSpace(nome)) throw new DomainException("Nome do parceiro é obrigatório.");
         if (string.IsNullOrWhiteSpace(email)) throw new DomainException("E-mail do parceiro é obrigatório.");
         if (especialidades == Especialidade.Nenhuma) throw new DomainException("Informe ao menos uma especialidade.");
@@ -24,6 +25,7 @@ public class Parceiro
         Email = email.Trim();
         Telefone = telefone?.Trim();
         Ativo = true;
+        VagasAtendimento = vagasAtendimento;
     }
 
     public int Id { get; private set; }
@@ -37,12 +39,25 @@ public class Parceiro
     public string? Telefone { get; private set; }
     public bool Ativo { get; private set; }
 
+    /// <summary>Saldo de vagas de atendimento disponíveis (reduzido pela operação transacional de reserva).</summary>
+    public int VagasAtendimento { get; private set; }
+
     public static string ChaveUf(string uf) => $";{uf.Trim().ToUpperInvariant()};";
 
     public bool Atende(string uf) =>
         Ativo && (UfsAtendidas == TodoBrasil || UfsAtendidas.Contains(ChaveUf(uf), StringComparison.Ordinal));
 
     public void Desativar() => Ativo = false;
+
+    /// <summary>Primeira escrita da transação: baixa o saldo. Rejeita quantidade inválida (400) e saldo insuficiente (409).</summary>
+    public void ReservarVagas(int quantidade)
+    {
+        if (quantidade <= 0) throw new DomainException("A quantidade de vagas deve ser maior que zero.");
+        if (!Ativo) throw new DomainException("O parceiro está inativo.");
+        if (quantidade > VagasAtendimento)
+            throw new ConflitoException($"Saldo insuficiente: o parceiro tem {VagasAtendimento} vaga(s) e foram pedidas {quantidade}.");
+        VagasAtendimento -= quantidade;
+    }
 
     private static string NormalizarUfs(IEnumerable<string> ufs)
     {

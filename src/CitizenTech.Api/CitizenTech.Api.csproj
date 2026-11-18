@@ -10,6 +10,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.*" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="equipe.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CitizenTech.Infrastructure\CitizenTech.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

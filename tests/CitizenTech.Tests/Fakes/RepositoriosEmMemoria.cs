@@ -14,6 +14,8 @@ public class BancoEmMemoria
     public List<Parceiro> Parceiros { get; } = new();
     public List<Encaminhamento> Encaminhamentos { get; } = new();
     public List<PrevisaoRisco> Previsoes { get; } = new();
+    public List<ImagemEstabelecimento> Imagens { get; } = new();
+    public List<ReservaAtendimento> Reservas { get; } = new();
     private readonly Dictionary<Type, int> _contadores = new();
 
     /// <summary>Simula a geração de Id do banco: uma sequência por tipo de entidade (os setters são privados no domínio).</summary>
@@ -32,7 +34,25 @@ public class BancoEmMemoria
 
 public class UnitOfWorkEmMemoria : IUnitOfWork
 {
+    /// <summary>Última transação iniciada (para os testes conferirem COMMIT/ROLLBACK).</summary>
+    public TransacaoEmMemoria? UltimaTransacao { get; private set; }
+
     public Task<int> SalvarAsync(CancellationToken ct = default) => Task.FromResult(0);
+
+    public Task<ITransacaoBanco> IniciarTransacaoAsync(CancellationToken ct = default)
+    {
+        UltimaTransacao = new TransacaoEmMemoria();
+        return Task.FromResult<ITransacaoBanco>(UltimaTransacao);
+    }
+}
+
+public class TransacaoEmMemoria : ITransacaoBanco
+{
+    public bool Confirmada { get; private set; }
+    public bool Revertida { get; private set; }
+    public Task CommitAsync(CancellationToken ct = default) { Confirmada = true; return Task.CompletedTask; }
+    public Task RollbackAsync(CancellationToken ct = default) { Revertida = true; return Task.CompletedTask; }
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 public class EstabelecimentoRepositorioEmMemoria : IEstabelecimentoRepository
@@ -227,4 +247,45 @@ public class PrevisaoRiscoRepositorioEmMemoria : IPrevisaoRiscoRepository
         foreach (var p in lote) { _b.GerarId(p); _b.Previsoes.Add(p); }
         return Task.CompletedTask;
     }
+}
+
+public class ImagemRepositorioEmMemoria : IImagemRepository
+{
+    private readonly BancoEmMemoria _b;
+    public ImagemRepositorioEmMemoria(BancoEmMemoria banco) => _b = banco;
+
+    public Task AdicionarAsync(ImagemEstabelecimento imagem, CancellationToken ct = default)
+    {
+        _b.GerarId(imagem);
+        _b.Imagens.Add(imagem);
+        return Task.CompletedTask;
+    }
+
+    private static ImagemMetadados Meta(ImagemEstabelecimento i) => new(i.Id, i.EstabelecimentoId, i.Titulo, i.NomeArquivo,
+        i.TipoMime, i.TamanhoBytes, i.DataUtc, i.EquipeRmLider, i.Executor);
+
+    public Task<ImagemMetadados?> ObterMetadadosAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(_b.Imagens.Where(i => i.Id == id).Select(Meta).FirstOrDefault());
+
+    public Task<IReadOnlyList<ImagemMetadados>> ListarPorEstabelecimentoAsync(int estabelecimentoId, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<ImagemMetadados>>(_b.Imagens.Where(i => i.EstabelecimentoId == estabelecimentoId).Select(Meta).ToList());
+
+    public Task<ImagemEstabelecimento?> ObterComConteudoAsync(int id, CancellationToken ct = default) =>
+        Task.FromResult(_b.Imagens.FirstOrDefault(i => i.Id == id));
+}
+
+public class ReservaRepositorioEmMemoria : IReservaRepository
+{
+    private readonly BancoEmMemoria _b;
+    public ReservaRepositorioEmMemoria(BancoEmMemoria banco) => _b = banco;
+
+    public Task AdicionarAsync(ReservaAtendimento reserva, CancellationToken ct = default)
+    {
+        _b.GerarId(reserva);
+        _b.Reservas.Add(reserva);
+        return Task.CompletedTask;
+    }
+
+    public Task<IReadOnlyList<ReservaAtendimento>> ListarAsync(int? parceiroId, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<ReservaAtendimento>>(_b.Reservas.Where(r => parceiroId is null || r.ParceiroId == parceiroId).ToList());
 }

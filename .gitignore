@@ -5,3 +5,7 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+
+*.user
+secrets.json
+appsettings.Development.json

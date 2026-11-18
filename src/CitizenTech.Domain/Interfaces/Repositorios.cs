@@ -7,6 +7,15 @@ namespace CitizenTech.Domain.Interfaces;
 public interface IUnitOfWork
 {
     Task<int> SalvarAsync(CancellationToken ct = default);
+
+    /// <summary>Inicia uma transação local do banco (BEGIN). Use CommitAsync/RollbackAsync; ao descartar sem commit, reverte.</summary>
+    Task<ITransacaoBanco> IniciarTransacaoAsync(CancellationToken ct = default);
+}
+
+public interface ITransacaoBanco : IAsyncDisposable
+{
+    Task CommitAsync(CancellationToken ct = default);
+    Task RollbackAsync(CancellationToken ct = default);
 }
 
 public interface IEstabelecimentoRepository
@@ -64,4 +73,22 @@ public interface IPrevisaoRiscoRepository
 
     /// <summary>Insere um lote e persiste imediatamente (importação em massa, sem acumular entidades rastreadas).</summary>
     Task InserirLoteAsync(IReadOnlyList<PrevisaoRisco> lote, CancellationToken ct = default);
+}
+
+public interface IImagemRepository
+{
+    Task AdicionarAsync(ImagemEstabelecimento imagem, CancellationToken ct = default);
+
+    /// <summary>Somente metadados (não carrega os bytes).</summary>
+    Task<ImagemMetadados?> ObterMetadadosAsync(int id, CancellationToken ct = default);
+    Task<IReadOnlyList<ImagemMetadados>> ListarPorEstabelecimentoAsync(int estabelecimentoId, CancellationToken ct = default);
+
+    /// <summary>Carrega a imagem completa, com os bytes.</summary>
+    Task<ImagemEstabelecimento?> ObterComConteudoAsync(int id, CancellationToken ct = default);
+}
+
+public interface IReservaRepository
+{
+    Task AdicionarAsync(ReservaAtendimento reserva, CancellationToken ct = default);
+    Task<IReadOnlyList<ReservaAtendimento>> ListarAsync(int? parceiroId, CancellationToken ct = default);
 }

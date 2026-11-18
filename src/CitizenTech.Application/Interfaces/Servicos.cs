@@ -1,4 +1,5 @@
 using CitizenTech.Application.Dtos;
+using CitizenTech.Application.Equipe;
 using CitizenTech.Domain.Enums;
 using CitizenTech.Domain.Models;
 
@@ -48,4 +49,20 @@ public interface IRiscoService
     Task<PrevisaoEscolaResponse> ObterEscolaAsync(long codigoInep, CancellationToken ct = default);
     Task<int> ContarAsync(CancellationToken ct = default);
     Task<ImportacaoResponse> ImportarAsync(string caminhoCsv, string? uf, CancellationToken ct = default);
+}
+
+public interface IImagemService
+{
+    /// <summary>Valida (R7) e grava a imagem com os bytes no banco.</summary>
+    Task<ImagemResponse> EnviarAsync(ImagemUpload upload, CancellationToken ct = default);
+    Task<ImagemResponse> ObterMetadadosAsync(int id, CancellationToken ct = default);
+    Task<IReadOnlyList<ImagemResponse>> ListarPorEstabelecimentoAsync(int estabelecimentoId, CancellationToken ct = default);
+    Task<ImagemConteudo> ObterConteudoAsync(int id, CancellationToken ct = default);
+}
+
+public interface IReservaService
+{
+    /// <summary>Operação transacional: baixa o saldo do parceiro e insere a reserva (COMMIT) ou reverte tudo (ROLLBACK).</summary>
+    Task<ReservaResponse> ReservarAsync(ReservaRequest request, CancellationToken ct = default);
+    Task<IReadOnlyList<ReservaResponse>> ListarAsync(int? parceiroId, CancellationToken ct = default);
 }

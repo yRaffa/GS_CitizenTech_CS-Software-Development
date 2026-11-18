@@ -58,11 +58,13 @@ public record ParceiroRequest
     public List<string> UfsAtendidas { get; init; } = new();
     [Required, EmailAddress, StringLength(150)] public string Email { get; init; } = string.Empty;
     [StringLength(30)] public string? Telefone { get; init; }
+    /// <summary>Saldo inicial de vagas de atendimento.</summary>
+    [Range(0, 100000)] public int VagasAtendimento { get; init; }
 }
 
 public record ParceiroResponse(
     int Id, string Nome, string Descricao, Especialidade Especialidades, string UfsAtendidas,
-    string Email, string? Telefone, bool Ativo);
+    string Email, string? Telefone, bool Ativo, int VagasAtendimento);
 
 public record ParceiroSugeridoResponse(ParceiroResponse Parceiro, Especialidade EspecialidadesCompativeis, int Aderencia);
 
@@ -92,3 +94,37 @@ public record PrevisaoEscolaResponse(
     bool SemRampaDeclarado, FaixaRisco Faixa);
 
 public record ImportacaoResponse(int Importadas, int Ignoradas, string Arquivo);
+
+// ------------------------------- Equipe ------------------------------------
+public record EquipeResponse(string CitizenTech, string Turma, string RmLider, IReadOnlyList<IntegranteResponse> Integrantes);
+public record IntegranteResponse(string NomeCompleto, string Rm, string Turma, string NomeAlunoRm, bool Lider);
+
+// -------------------------------- Imagem -----------------------------------
+/// <summary>Dados do upload (multipart). Os bytes chegam já lidos do arquivo.</summary>
+public record ImagemUpload(string Titulo, int EstabelecimentoId, string Executor, string NomeArquivo, string TipoMime, byte[] Dados);
+
+public record ImagemResponse(
+    int Id, int EstabelecimentoId, string Titulo, string NomeArquivo, string TipoMime, int TamanhoBytes,
+    DateTime DataUtc, string EquipeRmLider, string Executor, string UrlConteudo);
+
+/// <summary>Conteúdo para o GET de bytes: o controller devolve File(bytes, mime).</summary>
+public record ImagemConteudo(byte[] Dados, string TipoMime, string NomeArquivo);
+
+// -------------------------------- Reserva ----------------------------------
+/// <summary>Encaminhar um diagnóstico a um parceiro reservando vagas (operação transacional).</summary>
+public record ReservaRequest
+{
+    /// <summary>Diagnóstico a encaminhar (o estabelecimento é obtido dele: avaliação → estabelecimento).</summary>
+    public int DiagnosticoId { get; init; }
+    public int ParceiroId { get; init; }
+    /// <summary>Vagas de atendimento a reservar (deve ser maior que zero).</summary>
+    public int Quantidade { get; init; }
+    /// <summary>NomeAluno_RM de quem executa (precisa estar no equipe.json).</summary>
+    public string Executor { get; init; } = string.Empty;
+    /// <summary>Somente para o teste T08: lança falha DEPOIS das duas escritas e ANTES do COMMIT (ROLLBACK).</summary>
+    public bool SimularFalhaAposEscritas { get; init; }
+}
+
+public record ReservaResponse(
+    int Id, int EncaminhamentoId, int DiagnosticoId, int ParceiroId, string ParceiroNome, int EstabelecimentoId, int Quantidade,
+    int VagasRestantesParceiro, DateTime DataUtc, string EquipeRmLider, string Executor);

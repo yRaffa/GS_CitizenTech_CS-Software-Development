@@ -25,9 +25,27 @@ public class TratamentoDeErrosMiddleware
         {
             await ResponderAsync(contexto, StatusCodes.Status404NotFound, "Recurso não encontrado", ex.Message);
         }
+        catch (ConflitoException ex)
+        {
+            await ResponderAsync(contexto, StatusCodes.Status409Conflict, "Conflito com o estado atual", ex.Message);
+        }
+        catch (ArquivoGrandeDemaisException ex)
+        {
+            await ResponderAsync(contexto, StatusCodes.Status413PayloadTooLarge, "Arquivo grande demais", ex.Message);
+        }
+        catch (OperacaoRevertidaException ex)
+        {
+            _logger.LogWarning("ROLLBACK executado em {Metodo} {Caminho}: {Mensagem}", contexto.Request.Method, contexto.Request.Path, ex.Message);
+            await ResponderAsync(contexto, StatusCodes.Status500InternalServerError, "Transação revertida (ROLLBACK)", ex.Message);
+        }
         catch (DomainException ex)
         {
             await ResponderAsync(contexto, StatusCodes.Status400BadRequest, "Regra de negócio violada", ex.Message);
+        }
+        catch (Exception ex) when (ex is Microsoft.Data.SqlClient.SqlException or TimeoutException or InvalidOperationException { InnerException: Microsoft.Data.SqlClient.SqlException })
+        {
+            _logger.LogError(ex, "Banco indisponível em {Metodo} {Caminho}", contexto.Request.Method, contexto.Request.Path);
+            await ResponderAsync(contexto, StatusCodes.Status503ServiceUnavailable, "Banco de dados indisponível", "Não foi possível acessar o banco de dados agora. Tente novamente em instantes.");
         }
         catch (Exception ex)
         {

@@ -30,7 +30,7 @@ public class ParceiroService : IParceiroService
     public async Task<ParceiroResponse> CriarAsync(ParceiroRequest request, CancellationToken ct = default)
     {
         var parceiro = new Parceiro(request.Nome, request.Descricao ?? string.Empty, request.Especialidades,
-                                    request.UfsAtendidas, request.Email, request.Telefone);
+                                    request.UfsAtendidas, request.Email, request.Telefone, request.VagasAtendimento);
         await _parceiros.AdicionarAsync(parceiro, ct);
         await _uow.SalvarAsync(ct);
         return parceiro.ToResponse();
